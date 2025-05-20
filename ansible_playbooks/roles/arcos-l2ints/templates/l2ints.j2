@@ -1,0 +1,33 @@
+{% if l2ints is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <interfaces xmlns="http://openconfig.net/yang/interfaces">
+{% for int in l2ints %}
+  <interface>
+    <name>{{ int.name }}</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>{{ int.name }}</name>
+      {% if int.description is defined %}
+      <description>{{ int.description }}</description>
+      {% endif %}
+      <enabled>{{ int.enabled | string | lower }}</enabled>
+    </config>
+    <ethernet xmlns="http://openconfig.net/yang/interfaces/ethernet">
+      <switched-vlan xmlns="http://openconfig.net/yang/vlan">
+        <config>
+          <interface-mode>{{ int.mode | upper }}</interface-mode>
+          {% if 'access' in int.mode %}
+          <access-vlan>{{ int.vlan }}</access-vlan>
+          {% elif 'trunk' in int.mode %}
+          {% for vlan_id in int.vlan %}
+          <trunk-vlans>{{ vlan_id }}</trunk-vlans>
+          {% endfor %}
+          {% endif %}
+        </config>
+      </switched-vlan>
+    </ethernet>
+  </interface>
+{% endfor %}
+  </interfaces>
+</config>
+{% endif %}

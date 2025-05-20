@@ -1,0 +1,167 @@
+base_number: 1
+loopback0_v4: "1.1.1.2"
+l3_rd: "{{ loopback0_v4 }}:100"
+l3_rt: "1000:1000"
+l3_vni: "1000"
+overlay_source: "loopback0"
+evpn_anycast_mac: "00:10:10:10:10:10"
+
+l3ints:
+  - name: loopback0
+    ipv4: "{{ loopback0_v4 }}/32" 
+    enabled: true
+
+  - name: loopback10
+    ipv4: "100.1.1.2/32"
+    ipv6: "2000:100:1:1::2/128"
+    enabled: true
+  
+  - name: swp49
+    ipv4: "192.168.0.4/31"
+    enabled: true
+
+  - name: swp53
+    ipv4: "192.168.0.6/31"
+    enabled: true
+  
+  - name: vlan10
+    ipv4: "100.10.0.1/24"
+    ipv6: "2000:10:0:1::1/64"
+    enabled: true
+  
+  - name: vlan20
+    ipv4: "100.20.0.1/24"
+    ipv6: "2000:20:0:1::1/64"
+    enabled: true
+  
+  - name: vlan40
+    ipv4: "100.40.0.1/24"
+    ipv6: "2000:40:0:1::1/64"
+    enabled: true
+  
+
+
+bgp:
+ network_instance: default
+ as: 65002
+ router_id: "{{ loopback0_v4 }}"
+ address_families:
+   - name: L2VPN_EVPN
+     max_paths: 
+      - name: ebgp
+        value: 32
+      - name: ibgp
+        value: 32
+   - name: IPV4_UNICAST
+     max_paths: 
+      - name: ebgp
+        value: 32
+      - name: ibgp
+        value: 32
+     networks: [ "{{ loopback0_v4 }}/32" ]
+
+ neighbors:
+   - address: 192.168.0.5
+     peer_group: spine-underlay
+     local_address: 192.168.0.4
+   - address: 192.168.0.7
+     peer_group: spine-underlay
+     local_address: 192.168.0.6
+   - address: 2.1.1.1
+     peer_group: overlay-evpn
+   - address: 2.1.1.2
+     peer_group: overlay-evpn
+
+ peer_groups:
+   - name: spine-underlay
+     as: 65100
+     address_families:
+      - name: IPV4_UNICAST
+   - name: overlay-evpn
+     as: 65100
+     local_address: "{{ loopback0_v4 }}"
+     multihop: 5
+     address_families:
+      - name: L2VPN_EVPN
+
+vlans:
+ - id: 10
+   state: present
+   evpn:
+    advertise_mac_routes: true
+    rd: "{{ loopback0_v4 }}:10"
+    l2_vni: "1010"
+ - id: 20
+   state: present
+   evpn:
+    advertise_mac_routes: true
+    rd: "{{ loopback0_v4 }}:20"
+    l2_vni: "1020"
+ - id: 40
+   state: present
+   evpn:
+    advertise_mac_routes: true
+    rd: "{{ loopback0_v4 }}:40"
+    l2_vni: "1040"
+
+l2ints:
+ - name: swp51
+   mode: trunk
+   description: "host2-connection"
+   enabled: true
+   vlan: [ 10, 20, 40 ]
+
+l3vrf:
+ - name: "Tenant-A"
+   redistribute:
+    - src: DIRECTLY_CONNECTED
+      dest: BGP
+      address_family: IPV4
+    - src: DIRECTLY_CONNECTED
+      dest: BGP
+      address_family: IPV6
+   
+   interfaces:
+    - name: vlan10
+    - name: vlan20
+    - name: vlan40
+    - name: loopback10
+   
+   protocols:
+    - protocol: BGP
+      rd: "{{ l3_rd }}"
+      address_family:
+       - name: IPV4_UNICAST
+         max_paths:
+          - name: ebgp
+            value: 32
+          - name: ibgp
+            value: 32
+         route_targets:
+          - target_address_family: L2VPN_EVPN
+            target_values:
+             - value: "{{ l3_rt }}"
+               type: both
+       - name: IPV6_UNICAST
+         max_paths:
+          - name: ebgp
+            value: 32
+          - name: ibgp
+            value: 32
+         route_targets:
+          - target_address_family: L2VPN_EVPN
+            target_values:
+             - value: "{{ l3_rt }}"
+               type: both
+   vni: "{{ l3_vni }}"
+
+evpn_global:
+ anycast_mac: "{{ evpn_anycast_mac }}"
+
+hardware:
+ platform:
+  forwarding_scale:
+   fwd_profile: "P1"
+   overlay_nexthop_profile: "P3"
+
+

@@ -1,0 +1,13 @@
+---
+- name: Load Configuration From File
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: load configuration from file
+      arrcus.arcos.arcos_config:
+        src: /local/serhat/ansible-demo/leaf1-config-apr4.txt
+        load_operation: merge
+      register: "arcos_output"
+      when: ansible_network_os == "arrcus.arcos.arcos"

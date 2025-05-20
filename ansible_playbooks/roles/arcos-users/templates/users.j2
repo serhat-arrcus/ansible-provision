@@ -1,0 +1,13 @@
+{% if users is defined  %}
+<system xmlns="http://openconfig.net/yang/system">
+  <aaa>
+    <authentication>
+      <admin-user>
+        <config>
+          <ssh-key xmlns="http://yang.arrcus.com/arcos/openconfig/system/augments">{{ users.admin_ssh_key }}</ssh-key>
+        </config>
+      </admin-user>
+    </authentication>
+  </aaa>
+</system>
+{% endif %}

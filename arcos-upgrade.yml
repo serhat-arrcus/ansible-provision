@@ -1,0 +1,30 @@
+---
+- name: Upgrade ArcOS Version
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  vars_files:
+    - arcos_vars.yml
+  tasks:
+    - name: Upgrade Version
+      arrcus.arcos.arcos_command:
+        commands:
+          - command: "request system software install source-interface ma1 package-name {{ install_path }}"
+            encoding: "text"
+            prompt: 'Do you wish to continue\? This operation can cause network disruption \[no,yes\]'
+            answer: "yes"
+      register: arcos_upgrade_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - debug: var=arcos_upgrade_output
+
+    - pause: seconds=300
+
+    - name: Show Version
+      arrcus.arcos.arcos_command:
+        commands:
+          - command: "show version"
+            encoding: "text"
+      register: arcos_show_version_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - debug: var=arcos_show_version_output

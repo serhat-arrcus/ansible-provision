@@ -1,0 +1,24 @@
+{% if hardware is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <hardware xmlns="http://yang.arrcus.com/arcos/hardware">
+    {% if hardware.platform is defined %}
+    <config>
+      <platform>
+        {% if hardware.platform.forwarding_scale is defined %}
+        <config>
+          <forwarding-scale>
+            {% if hardware.platform.forwarding_scale.fwd_profile is defined %}
+            <fwd-profile>{{ hardware.platform.forwarding_scale.fwd_profile }}</fwd-profile>
+            {% endif %}
+            {% if hardware.platform.forwarding_scale.overlay_nexthop_profile is defined %}
+            <overlay-nexthop-profile>{{ hardware.platform.forwarding_scale.overlay_nexthop_profile }}</overlay-nexthop-profile>
+            {% endif %}
+          </forwarding-scale>
+        </config>
+        {% endif %}
+      </platform>
+    </config>
+    {% endif %}
+  </hardware>
+</config>
+{% endif %}

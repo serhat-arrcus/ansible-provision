@@ -1,0 +1,24 @@
+---
+- hosts: leaf
+  gather_facts: false
+
+  vars:
+   load_operation: merge
+
+  roles:
+   - role: arcos-system
+     tags: system
+   - role: arcos-vlan
+     tags: vlan
+   - role: arcos-l3ints
+     tags: l3
+   - role: arcos-evpn-global
+     tags: evpn-global
+   - role: arcos-l2ints
+     tags: l2ints
+   - role: arcos-bgp
+     tags: bgp
+   - role: arcos-l3vrf
+     tags: l3vrf
+   - role: arcos-l2vrf
+     tags: l2vrf

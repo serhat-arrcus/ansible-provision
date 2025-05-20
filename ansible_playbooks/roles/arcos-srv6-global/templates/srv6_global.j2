@@ -1,0 +1,16 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <network-instances xmlns="http://openconfig.net/yang/network-instance">
+    <network-instance>
+      <name>default</name>
+      <srv6 xmlns="http://yang.arrcus.com/arcos/srv6">
+        <locator>
+          <name>{{ srv6.locator }}</name>
+          <config>
+            <locator-node-length>{{ srv6.locator_node_length }}</locator-node-length>
+            <prefix>{{ srv6.prefix }}</prefix>
+          </config>
+        </locator>
+      </srv6>
+    </network-instance>
+  </network-instances>
+</config>

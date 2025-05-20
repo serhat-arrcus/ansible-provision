@@ -1,0 +1,13 @@
+---
+- name: Retrieve Show ARP Entries Command Output
+  hosts: all
+  gather_facts: no
+
+  tasks:
+      - name: Show ArcOS ARP Entries
+        arcos_command:
+            command: "show arp-entries | tab"
+            encoding: "text"
+        register: arcos_command_output
+       
+      - debug: var=arcos_command_output

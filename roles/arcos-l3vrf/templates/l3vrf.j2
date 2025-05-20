@@ -1,0 +1,164 @@
+{% if l3vrf is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <network-instances xmlns="http://openconfig.net/yang/network-instance">
+
+{% for vrf in l3vrf %}
+    {% if vrf.state is defined and vrf.state == 'absent' %}
+       <network-instance operation="delete">
+          <name>{{ vrf.name }}</name>
+       </network-instance>
+
+    {% else %} 
+
+  <network-instance>
+    <name>{{ vrf.name }}</name>
+    <config>
+      <name>{{ vrf.name }}</name>
+      <type xmlns:oc-ni-types="http://openconfig.net/yang/network-instance-types">oc-ni-types:L3VRF</type>
+    </config>
+
+    {% if vrf.redistribute is defined %}
+    <table-connections>
+        {% for redis in vrf.redistribute %}
+      <table-connection>
+        <src-protocol xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ redis.src }}</src-protocol>
+        <dst-protocol xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ redis.dest }}</dst-protocol>
+        <address-family xmlns:oc-types="http://openconfig.net/yang/openconfig-types">oc-types:{{ redis.address_family }}</address-family>
+        <config>
+          <src-protocol xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ redis.src }}</src-protocol>
+          <address-family xmlns:oc-types="http://openconfig.net/yang/openconfig-types">oc-types:{{ redis.address_family }}</address-family>
+          <dst-protocol xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ redis.dest }}</dst-protocol>
+        </config>
+      </table-connection>
+          {% endfor %} 
+    </table-connections>
+    {% endif %}
+
+    {% if vrf.interfaces is defined %}
+    <interfaces>
+      {% for int in vrf.interfaces %}
+      <interface>
+        <id>{{ int.name }}</id>
+        <config>
+          <id>{{ int.name }}</id>
+          <interface>{{ int.name }}</interface>
+          <subinterface>0</subinterface>
+        </config>
+      </interface>
+       {% endfor %}
+    </interfaces>
+    {% endif %}
+
+    {% if vrf.protocols is defined %}
+    <protocols>
+      {% for protocol in vrf.protocols %}
+      <protocol>
+        <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ protocol.protocol }}</identifier>
+        <name>{{ vrf.name }}</name>
+        <config>
+          <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:{{ protocol.protocol }}</identifier>
+          <name>{{ vrf.name }}</name>
+        </config>
+       {% if protocol.protocol == 'BGP' %} 
+        <bgp>
+          <global>
+            <config>
+              <route-distinguisher xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">{{ protocol.rd }}</route-distinguisher>
+              {% if protocol.sid_alloc is defined and protocol.sid_alloc  %}
+              <sid-allocation-mode xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments" xmlns:arc-oc-bgp-types="http://yang.arrcus.com/arcos/openconfig/bgp/types">arc-oc-bgp-types:{{ protocol.sid_alloc }}</sid-allocation-mode>
+              {% endif %}
+              {% if protocol.label_alloc is defined and protocol.label_alloc %}
+               <label-allocation-mode xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments"
+                                     xmlns:oc-ni-types="http://openconfig.net/yang/network-instance-types">oc-ni-types:{{ protocol.label_alloc }}</label-allocation-mode>
+              {% endif %}
+            </config>
+            <afi-safis>
+            {% for af in protocol.address_family %}
+              <afi-safi>
+                <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ af.name }}</afi-safi-name>
+                <config>
+                  <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ af.name }}</afi-safi-name>
+                </config>
+                {% if af.max_paths is defined %}
+                 <use-maximum-paths xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                    <config>
+                 {% for type in af.max_paths %}
+                      <{{ type.name }}>
+                        <maximum-paths>{{ type.value }}</maximum-paths>
+                      </{{ type.name }}>
+                  {% endfor %}
+                    </config>
+                  </use-maximum-paths>
+                {% endif %}
+                <rt-afi-safis xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                  {% for rt in af.route_targets %}
+                  <rt-afi-safi>
+                    <rt-afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ rt.target_address_family }}</rt-afi-safi-name>
+                    <config>
+                      <rt-afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ rt.target_address_family }}</rt-afi-safi-name>
+                    </config>
+                    <route-targets>
+                    {% for value in rt.target_values %} 
+                      <route-target>
+                        <route-target>{{ value.value }}</route-target>
+                        <route-target-type>{{ value.type }}</route-target-type>
+                        <config>
+                          <route-target>{{ value.value }}</route-target>
+                          <route-target-type>{{ value.type }}</route-target-type>
+                        </config>
+                      </route-target>
+                        {% endfor %} {# endfor af.route_targets.values #}
+                      {% endfor %} {# endfor af.route_targets #}
+                    </route-targets>
+                  </rt-afi-safi> 
+                </rt-afi-safis>
+              </afi-safi>
+              {% endfor %} {# endfor protocol.address_family #}
+            </afi-safis>
+          </global>
+           {% if protocol.neighbors is defined %}
+            <neighbors>
+              {% for neigh in protocol.neighbors %}         
+              <neighbor>
+                <neighbor-address>{{ neigh.address }}</neighbor-address>
+                <config>
+                  <neighbor-address>{{ neigh.address }}</neighbor-address>
+                  <peer-as>{{ neigh.as }}</peer-as>
+                </config>
+                <transport>
+                  <config>
+                    <local-address>{{ neigh.local_address }}</local-address>
+                  </config>
+                </transport>
+                <afi-safis>
+                 {% for af in neigh.afi_safi %}
+                  <afi-safi>
+                    <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ af }}</afi-safi-name>
+                    <config>
+                      <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ af }}</afi-safi-name>
+                    </config>
+                  </afi-safi>
+                  {% endfor %}
+                </afi-safis>
+              </neighbor>
+              {% endfor %}
+            </neighbors>
+           {% endif %}
+        </bgp>
+        {% endif %}
+      </protocol>
+        {% endfor %}
+    </protocols>
+        {% endif %}
+    {% if vrf.vni is defined %}
+    <vni xmlns="http://yang.arrcus.com/arcos/vxlan">
+      <vni-id>{{ vrf.vni }}</vni-id>
+      <local-tunnel-endpoint-id>0</local-tunnel-endpoint-id>
+    </vni>
+    {% endif %}
+  </network-instance>
+    {% endif %} 
+{% endfor %}
+  </network-instances>
+</config>
+{% endif %}

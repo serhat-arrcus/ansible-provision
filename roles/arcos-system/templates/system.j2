@@ -1,0 +1,37 @@
+{% if system is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <system xmlns="http://openconfig.net/yang/system">
+    <config>
+      <hostname>{{ system.hostname }}</hostname>
+      <login-banner>{{ system.banner }}</login-banner>
+    </config>
+    <ssh-server>
+      <config>
+        <enable>{{ system.ssh.enabled | string | lower }}</enable>
+        <permit-root-login xmlns="http://yang.arrcus.com/arcos/openconfig/system/augments">{{ system.ssh.permit_root_user | string | lower }}</permit-root-login>
+      </config>
+      {% if system.sftp is defined %}
+      <sftp xmlns="http://yang.arrcus.com/arcos/openconfig/system/augments">
+        <config>
+          <enable>{{ system.sftp.enabled | string | lower }}</enable>
+        </config>
+      </sftp>
+       {% endif %}
+    </ssh-server>
+{% if system.netconf is defined %}
+    <netconf-server xmlns="http://yang.arrcus.com/arcos/openconfig/system/augments">
+      <config>
+        <enable>{{ system.netconf.enabled | string | lower }}</enable>
+      </config>
+      <transport>
+        <ssh>
+          <config>
+            <enable>{{ system.netconf.ssh | string | lower }}</enable>
+          </config>
+        </ssh>
+      </transport>
+    </netconf-server>
+{% endif %}
+  </system>
+</config>
+{% endif %}

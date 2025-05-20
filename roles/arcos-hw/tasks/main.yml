@@ -1,0 +1,31 @@
+---
+- name: Push new candidate config
+  template:
+     src: 'templates/hardware.j2'
+     dest: '/tmp/.{{ inventory_hostname }}.xml'
+  check_mode: no
+
+- name: Apply candidate config
+  arcos_config:
+    src: "/tmp/.{{ inventory_hostname }}.xml"
+    load_operation: '{{ load_operation }}'
+    comment: "{{ comment | default('') }}"
+  register: arcos_load
+
+- name: Remove temp file
+  file:
+    state: absent
+    path: '/tmp/.{{ inventory_hostname }}.xml'
+  check_mode: no
+
+- name: Write diff to file
+  blockinfile:
+   block: "{{ ('\n').join(arcos_load.message.splitlines()[1:-1]) }}"
+   dest: "{{ playbook_dir }}/{{ inventory_hostname }}.txt"
+   create: yes
+   marker: "<!-- {mark} Config Diff from {{ role_name }} role-->"
+  check_mode: no
+  when: ansible_check_mode
+  delegate_to: localhost
+
+

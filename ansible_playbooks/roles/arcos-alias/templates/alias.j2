@@ -1,0 +1,8 @@
+{% if alias is defined %}
+{% for entry in alias %}
+<alias xmlns="http://tail-f.com/ns/aaa/1.1">
+  <name>{{ entry.name }}</name>
+  <expansion>{{ entry.expansion }}</expansion>
+</alias>
+{% endfor %}
+{% endif %}

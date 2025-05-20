@@ -1,0 +1,69 @@
+{% if l3ints is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>ma1</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>ma1</name>
+      <enabled>true</enabled>
+    </config>
+    <subinterfaces>
+      <subinterface>
+        <index>0</index>
+      </subinterface>
+    </subinterfaces>
+  </interface>
+  {% for int in l3ints %}
+  <interface>
+    <name>{{ int.name }}</name>
+    <config>
+      {% if 'swp' in int.name %}
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      {% elif 'vlan' in int.name %}
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:l3ipvlan</type>
+      {% elif 'loopback' in int.name %}
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:softwareLoopback</type>
+      {% endif %}
+      <name>{{ int.name }}</name>
+      <enabled>{{ int.enabled | string | lower }}</enabled>
+      {% if int.description is defined %}
+      <description>{{ int.description }}</description>
+      {% endif %}
+    </config>
+    <subinterfaces>
+      <subinterface>
+        <index>0</index>
+        {% if int.ipv4 is defined %}
+        <ipv4 xmlns="http://openconfig.net/yang/interfaces/ip">
+          <addresses>
+            <address>
+              <ip>{{ int.ipv4.split('/')[0] }}</ip>
+              <config>
+                <ip>{{ int.ipv4.split('/')[0] }}</ip>
+                <prefix-length>{{ int.ipv4.split('/')[1] }}</prefix-length>
+              </config>
+            </address>
+          </addresses>
+        </ipv4>
+        {% endif %}
+        {% if int.ipv6 is defined %}
+        <ipv6 xmlns="http://openconfig.net/yang/interfaces/ip">
+          <addresses>
+            <address>
+              <ip>{{ int.ipv6.split('/')[0] }}</ip>
+              <config>
+                <ip>{{ int.ipv6.split('/')[0] }}</ip>
+                <prefix-length>{{ int.ipv6.split('/')[1] }}</prefix-length>
+              </config>
+            </address>
+          </addresses>
+        </ipv6>
+       {% endif %}
+      </subinterface>
+    </subinterfaces>
+  </interface>
+{% endfor %}
+  </interfaces>
+</config>
+{% endif %}

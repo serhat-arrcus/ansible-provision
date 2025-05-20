@@ -1,0 +1,35 @@
+home_dir: "{{ lookup('env','HOME') }}"
+users:
+   admin_ssh_key: "{{ lookup('file', '{{ home_dir }}/.ssh/id_rsa.pub') }}"
+system:
+  hostname: "{{ inventory_hostname }}"
+  banner: "ArcOS - {{ inventory_hostname }}"
+  sftp: 
+    enabled: true
+  ssh: 
+    enabled: true
+    permit_root_user: true
+  netconf:
+    enabled: true
+    ssh: true
+
+l3vrf:
+ - name: default
+   redistribute:
+   - src: DIRECTLY_CONNECTED
+     dest: BGP
+     address_family: IPV4
+   - src: DIRECTLY_CONNECTED
+     dest: BGP
+     address_family: IPV6
+
+
+alias:
+ - name: asu
+   expansion: "show network-instance default protocol BGP default all-neighbor state session-state | select state session-elapsed-time | select state peer-as | select state established-transitions | select state local-as" 
+ - name: p4
+   expansion: "show network-instance default protocol BGP default neighbor * afi-safi IPV4_UNICAST state prefixes"
+ - name: lldpn
+   expansion: "show lldp interface * neighbor * state system-name | select neighbor state port-id"
+
+

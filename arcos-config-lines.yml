@@ -1,0 +1,21 @@
+---
+- name: Configure multiple things
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: load configuration
+      arrcus.arcos.arcos_config:
+        lines:
+          [
+            "system hostname lab-test1",
+            "system snmp-server enable true",
+            'system login-banner "ansible-test"',
+          ]
+        load_operation: merge
+        comment: "changing hostname"
+      register: arcos_config_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - name: Print the Output
+      ansible.builtin.debug: var=arcos_config_output

@@ -1,0 +1,19 @@
+---
+- name: Retrieve Show Version Output
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: Show Version
+      arrcus.arcos.arcos_command:
+        commands:
+          - command: "show version"
+            encoding: "json"
+          - command: "show interface"
+            encoding: "xml"
+          - command: "show version"
+            encoding: "text"
+      register: arcos_command_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - debug: var=arcos_command_output

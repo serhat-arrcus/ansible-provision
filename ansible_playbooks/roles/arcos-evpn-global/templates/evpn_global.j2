@@ -1,0 +1,25 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <overlay xmlns="http://yang.arrcus.com/arcos/vxlan">
+    <local-tunnel-endpoint>
+      <ltep-id>0</ltep-id>
+      <source-interface>{{ overlay_source }}</source-interface>
+    </local-tunnel-endpoint>
+  </overlay>
+{% if evpn_global is defined %}
+<evpn xmlns="http://yang.arrcus.com/arcos/evpn">
+    <config>
+      <anycast-gateway-mac>{{ evpn_global.anycast_mac }}</anycast-gateway-mac>
+    </config>
+    <duplicate-mac-detection>
+      <config>
+        <window>60</window>
+        <threshold>7</threshold>
+        <auto-recovery-time>5</auto-recovery-time>
+      </config>
+    </duplicate-mac-detection>
+ </evpn>
+{% endif %}
+</config>
+
+
+

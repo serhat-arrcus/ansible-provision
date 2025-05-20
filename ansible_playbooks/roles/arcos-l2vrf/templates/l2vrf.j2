@@ -1,0 +1,84 @@
+{% if vlans is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+<vlans xmlns="http://openconfig.net/yang/vlan">
+{% for vlan in vlans %}
+  {% if vlan.state == 'present' %}
+  <vlan>
+    <vlan-id>{{ vlan.id  }}</vlan-id>
+    <config>
+      <vlan-id>{{ vlan.id }}</vlan-id>
+    </config>
+  </vlan>
+  {% elif vlan.state == 'absent' %}
+  <vlan operation="delete">
+    <vlan-id>{{ vlan.id }}</vlan-id>
+  </vlan>
+  {% endif %}
+{% endfor %}
+  </vlans>
+  <network-instances xmlns="http://openconfig.net/yang/network-instance">
+{% for vlan in vlans %}
+  {% if vlan.state == 'present' %}
+  <network-instance>
+    <name>vlan{{ vlan.id }}</name>
+    <config>
+      <name>vlan{{ vlan.id }}</name>
+      <type xmlns:oc-ni-types="http://openconfig.net/yang/network-instance-types">oc-ni-types:L2VLAN</type>
+      <vlan>{{ vlan.id }}</vlan>
+      {% if vlan.evpn.advertise_mac_routes is defined %}
+      <advertise-mac-routes>{{ vlan.evpn.advertise_mac_routes | string | lower }}</advertise-mac-routes>
+      {% endif %}
+    </config>
+    {% if vlan.evpn is defined %}
+    <protocols>
+      <protocol>
+        <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:BGP</identifier>
+        <name>vlan{{ vlan.id }}</name>
+        <config>
+          <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:BGP</identifier>
+          <name>vlan{{ vlan.id }}</name>
+        </config>
+        <bgp>
+          <global>
+            <config>
+              <route-distinguisher xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">{{ vlan.evpn.rd }}</route-distinguisher>
+            </config>
+          </global>
+          <route-targets xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+            <route-target>
+              <route-target>{{ vlan.id }}:{{ vlan.id }}</route-target>
+              <route-target-type>both</route-target-type>
+              <config>
+                <route-target>{{ vlan.id }}:{{ vlan.id }}</route-target>
+                <route-target-type>both</route-target-type>
+              </config>
+            </route-target>
+          </route-targets>
+        </bgp>
+      </protocol>
+    </protocols>
+    
+    <vni xmlns="http://yang.arrcus.com/arcos/vxlan">
+      <vni-id>{{ vlan.evpn.l2_vni }}</vni-id>
+      <local-tunnel-endpoint-id>0</local-tunnel-endpoint-id>
+    </vni>
+   {% endif %}
+  </network-instance>
+  {% elif vlan.state == 'absent' %}
+  <network-instance operation="delete">
+    <name>vlan{{ vlan.id }}</name>
+  </network-instance>
+  {% endif %}
+{% endfor %}
+  </network-instances>
+{% for vlan in vlans %}
+ {% if vlan.state == 'absent' %}
+<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface operation="delete">
+    <name>vlan{{ vlan.id }}</name>
+  </interface>
+</interfaces>
+  {% endif %}
+{% endfor %}
+</config>
+{% endif %}

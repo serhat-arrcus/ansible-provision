@@ -1,0 +1,183 @@
+{% if isis is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <network-instances xmlns="http://openconfig.net/yang/network-instance">
+    <network-instance>
+      <name>{{ isis.network_instance }}</name>
+      <protocols>
+        <protocol>
+          <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:ISIS</identifier>
+          <name>{{ isis.network_instance }}</name>
+          <config>
+            <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:ISIS</identifier>
+            <name>{{ isis.network_instance }}</name>
+          </config>
+          <isis>
+            <global>
+              <config>
+                <net>{{ isis.net }}</net>
+                <level-capability>{{ isis.level_capability | upper }}</level-capability>
+              </config>
+              <lsp-bit>
+                <overload-bit>
+                  <config>
+                    <set-bit-on-boot>true</set-bit-on-boot>
+                    <advertise-high-metric>true</advertise-high-metric>
+                  </config>
+                  <reset-triggers>
+                    <reset-trigger>
+                      <reset-trigger xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:WAIT_FOR_BGP</reset-trigger>
+                      <config>
+                        <reset-trigger xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:WAIT_FOR_BGP</reset-trigger>
+                        <delay>600</delay>
+                      </config>
+                    </reset-trigger>
+                  </reset-triggers>
+                </overload-bit>
+                {% if isis.lsp_bit.attached_bit is defined %}
+                <attached-bit>
+                  <config>
+                    <suppress-bit>{{ isis.lsp_bit.attached_bit.suppress_bit | string | lower }}</suppress-bit>
+                  </config>
+                </attached-bit>
+                {% endif %}
+              </lsp-bit>
+              {% if isis.timers is defined %}
+              <timers>
+                <config>
+                  <lsp-lifetime-interval>{{ isis.timers.lifetime_interval }}</lsp-lifetime-interval>
+                  <lsp-refresh-interval>{{ isis.timers.refresh_interval }}</lsp-refresh-interval>
+                </config>
+              </timers>
+              {% endif %}
+              {% if isis.srv6 is defined %}
+              <srv6 xmlns="http://yang.arrcus.com/arcos/openconfig/isis/augments">
+                <config>
+                  <enabled>{{ isis.srv6.enabled | string | lower }}</enabled>
+                </config>
+                <locator>
+                  <config>
+                    <name>{{ isis.srv6.locator }}</name>
+                  </config>
+                </locator>
+               </srv6>
+               {% endif %}
+              {% if isis.af is defined %}
+              <afi-safi>
+                {% for af in isis.af %}
+                <af>
+                  <afi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.afi_name.upper() }}</afi-name>
+                  <safi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.safi_name.upper() }}</safi-name>
+                  <config>
+                    <afi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.afi_name.upper() }}</afi-name>
+                    <safi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.safi_name.upper() }}</safi-name>
+                    <enabled>true</enabled>
+                  </config>
+                </af>
+                {% endfor %}
+              </afi-safi>
+              {% endif %}
+              {% if isis.te.routerid is defined %}
+              <traffic-engineering xmlns="http://yang.arrcus.com/arcos/openconfig/isis/augments">
+                <config>
+                  <ipv6-router-id>{{ isis.te.routerid }}</ipv6-router-id>
+                </config>
+              </traffic-engineering>
+              {% endif %}
+            </global>
+           {% if isis.levels is defined %}
+            <levels>
+              {% for level in isis.levels %}
+              <level>
+                <level-number>{{ level.id }}</level-number>
+                <config>
+                  <enabled>{{ level.enabled | string | lower  }}</enabled>
+                  <level-number>{{ level.id }}</level-number>
+                </config>
+              </level>
+              {% endfor %}
+            </levels>
+            {% endif %}
+            <interfaces>
+              {% for intf in isis.interfaces %}
+              <interface>
+                <interface-id>{{ intf.name }}</interface-id>
+                <config>
+                  <enabled>{{ intf.enabled | string | lower }}</enabled>
+                  <interface-id>{{ intf.name }}</interface-id>
+                  {% if intf.passive is defined %}
+                  <passive>{{ intf.passive | string | lower }}</passive>
+                  {% endif %}
+                  {% if intf.type is defined%}
+                  <network-type xmlns="http://yang.arrcus.com/arcos/openconfig/isis/augments">{{ intf.type.upper() }}</network-type>
+                  {% endif %}
+                   
+                </config>
+                {% if intf.auth is defined %}
+                <authentication>
+                  <config>
+                    <hello-authentication>true</hello-authentication>
+                  </config>
+                  <key>
+                    <config>
+                      <auth-password>{{ intf.auth.password }}</auth-password>
+                      <crypto-algorithm xmlns="http://yang.arrcus.com/arcos/openconfig/isis/augments">{{ intf.auth.algo | default('MD5') }}</crypto-algorithm>
+                    </config>
+                  </key>
+                </authentication>
+                {% endif %}
+                {% if intf.af is defined %}
+                <afi-safi>
+                  {% for af in intf.af %}
+                  <af>
+                    <afi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.afi_name }}</afi-name>
+                    <safi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.safi_name }}</safi-name>
+                    <config>
+                      <afi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.afi_name }}</afi-name>
+                      <safi-name xmlns:oc-isis-types="http://openconfig.net/yang/isis-types">oc-isis-types:{{ af.safi_name }}</safi-name>
+                      <enabled>true</enabled>
+                    </config>
+                  </af>
+                   {% endfor %}
+                </afi-safi>
+                {% endif %} 
+                {% if intf.levels is defined %}
+                <levels>
+                   {% for level in intf.levels %}
+                  <level>
+                    <level-number>{{ level.id }} </level-number>
+                    <config>
+                      <level-number>{{ level.id }}</level-number>
+                      <enabled>{{ level.enabled | string | lower }}</enabled>
+                      {% if level.metric is defined %}
+                      <metric xmlns="http://yang.arrcus.com/arcos/openconfig/isis/augments">{{ level.metric }}</metric>
+                      {% endif %}
+                    </config>
+                  </level>
+                  {% endfor %}
+                </levels>
+                {% endif %}
+                {% if intf.timers is defined %}
+                <timers>
+                  <config>
+                    {% if intf.timers.csnp_interval is defined %}
+                    <csnp-interval>{{ intf.timers.csnp_interval }}</csnp-interval>
+                    {% endif %}
+                  </config>
+                </timers>
+                {% endif %}
+                <interface-ref>
+                  <config>
+                    <interface>{{ intf.name }}</interface>
+                    <subinterface>0</subinterface>
+                  </config>
+                </interface-ref>
+              </interface>
+              {% endfor %}
+            </interfaces>
+          </isis>
+        </protocol>
+      </protocols>
+    </network-instance>
+  </network-instances>
+</config>
+{% endif %}

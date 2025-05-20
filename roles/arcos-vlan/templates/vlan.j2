@@ -1,0 +1,14 @@
+{% if vlans is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <vlans xmlns="http://openconfig.net/yang/vlan">
+    {% for vlan in vlans %}
+    <vlan>
+      <vlan-id>{{ vlan.id  }}</vlan-id>
+      <config>
+        <vlan-id>{{ vlan.id  }}</vlan-id>
+      </config>
+    </vlan>
+  {% endfor %}
+  </vlans>
+</config>
+{% endif %}

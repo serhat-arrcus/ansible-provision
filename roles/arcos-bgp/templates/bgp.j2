@@ -1,0 +1,187 @@
+{% if bgp is defined %}
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <network-instances xmlns="http://openconfig.net/yang/network-instance">
+  <network-instance>
+    <name>{{ bgp.network_instance }}</name>
+    <config>
+      <name>{{ bgp.network_instance }}</name>
+    </config>
+    <protocols>
+      <protocol>
+        <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:BGP</identifier>
+        <name>{{ bgp.network_instance }}</name>
+        <config>
+          <identifier xmlns:oc-pol-types="http://openconfig.net/yang/policy-types">oc-pol-types:BGP</identifier>
+          <name>{{ bgp.network_instance }}</name>
+        </config>
+        <bgp>
+          <global>
+            <config>
+              <as>{{ bgp.as }}</as>
+              {% if bgp.sid_alloc_mode is defined %}
+              <sid-allocation-mode xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments" xmlns:arc-oc-bgp-types="http://yang.arrcus.com/arcos/openconfig/bgp/types">arc-oc-bgp-types:{{ bgp.sid_alloc_mode }}</sid-allocation-mode>
+               {% endif %}
+              <router-id>{{ bgp.router_id }}</router-id>
+            </config>
+            <afi-safis>
+              {% for afi in bgp.address_families %}
+              <afi-safi>
+                <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ afi.name }}</afi-safi-name>
+                <config>
+                  <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:{{ afi.name }}</afi-safi-name>
+                  <retain-route-target-all xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">true</retain-route-target-all>
+                </config>
+                {% if afi.name == 'IPV4_UNICAST' and afi.networks is defined %}
+                <ipv4-unicast>
+                  <networks xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                       {% for network in afi.networks %} 
+                    <network>
+                      <prefix>{{ network }}</prefix>
+                      <config>
+                        <prefix>{{ network }}</prefix>
+                      </config>
+                    </network>
+                       {% endfor %} 
+                  </networks>
+                </ipv4-unicast>
+                {% endif %}
+                {% if afi.max_paths is defined %}
+                <use-maximum-paths xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                  <config>
+                   {% for path in afi.max_paths %}
+                    <{{ path.name }}>
+                      <maximum-paths>{{ path.value }}</maximum-paths>
+                    </{{ path.name }}>
+                   {% endfor %}
+                  </config>
+                </use-maximum-paths>
+                {% endif %}
+              </afi-safi>
+              {% endfor %} 
+            </afi-safis>
+             {% if bgp.srv6_locator is defined %}
+             <srv6 xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                <config>
+                  <locator>{{ bgp.srv6_locator }}</locator>
+                </config>
+              </srv6>
+             {% endif %}
+          </global>
+          {% if bgp.neighbors is defined %}
+          <neighbors>
+             {% for neigh in bgp.neighbors %}
+                {% if neigh.state is defined and neigh.state == 'absent' %}
+                  <neighbor operation="delete"> 
+                {% else %}
+                  <neighbor>
+                {% endif %}
+              <neighbor-address>{{ neigh.address }}</neighbor-address>
+              <config>
+                {% if neigh.peer_group is defined %}
+                <peer-group>{{ neigh.peer_group }}</peer-group>
+                {% endif %}
+                <neighbor-address>{{ neigh.address }}</neighbor-address>
+                {% if neigh.peer_as is defined %}
+                <peer-as>{{ neigh.peer_as }}</peer-as>
+                {% endif %}
+
+              </config>
+                {% if neigh.local_address is defined %}
+                <transport>
+                <config>
+                  <local-address>{{ neigh.local_address }}</local-address>
+                </config>
+              </transport>
+              {% endif %}
+            </neighbor>
+          {% endfor %} 
+          </neighbors>
+          {% endif %}
+          {% if bgp.peer_groups is defined %}
+          <peer-groups>
+            {% for group in bgp.peer_groups %}
+            <peer-group>
+              <peer-group-name>{{ group.name }}</peer-group-name>
+              <config>
+                <peer-group-name>{{ group.name }}</peer-group-name>
+                {% if group.as is defined %}
+                <peer-as>{{ group.as }}</peer-as>
+                {% endif %}
+              </config>
+
+             {% if group.route_server_client is defined and group.route_server_client %}
+             <route-server xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+             <config>
+                <route-server-client>true</route-server-client>
+                </config>
+                </route-server>
+            {% endif %}
+ 
+              {% if group.local_address is defined %}
+              <transport>
+                <config>
+                  <local-address>{{ group.local_address }}</local-address>
+                </config>
+              </transport>
+              {% endif %}
+              {% if group.multihop is defined %}
+              <ebgp-multihop>
+                <config>
+                  <multihop-ttl>{{ group.multihop }}</multihop-ttl>
+                </config>
+              </ebgp-multihop>
+              {% endif %}
+              {% if group.address_families is defined %}
+              <afi-safis>
+                {% for af in group.address_families %}
+
+              <afi-safi>
+              <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">
+               oc-bgp-types:{{ af.name }}
+             </afi-safi-name>
+             <config>
+             <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">
+               oc-bgp-types:{{ af.name }}
+               </afi-safi-name>
+              </config>
+
+                  {% if af.add_paths is defined%}
+                 <add-paths xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                      <config>
+                        <send xmlns:arc-oc-bgp-types="http://yang.arrcus.com/arcos/openconfig/bgp/types">arc-oc-bgp-types:{{ af.add_paths.send }}</send>
+                        <receive>{{ af.add_paths.receive | string | lower }}</receive>
+                      </config>
+                    </add-paths>
+                   {% endif %}
+
+                  {% if af.next_hop is defined %}
+                  <next-hop xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                    <config>
+                       <mode>{{ af.next_hop }}</mode>
+                    </config>
+                  </next-hop>
+                  {% endif %}
+
+
+                   {% if af.extended_nexthop is defined and af.extended_nexthop %}
+                    <extended-nexthop xmlns="http://yang.arrcus.com/arcos/openconfig/bgp/augments">
+                      <config>
+                        <enable>true</enable>
+                      </config>
+                    </extended-nexthop>
+                  {% endif %}
+                </afi-safi>
+                {% endfor %}
+              </afi-safis>
+              {% endif %}
+            </peer-group>
+            {% endfor %}
+          </peer-groups>
+            {% endif %} {# endof of peer groups loop #}
+        </bgp>
+      </protocol>
+    </protocols>
+  </network-instance>
+  </network-instances>
+</config>
+{% endif %}

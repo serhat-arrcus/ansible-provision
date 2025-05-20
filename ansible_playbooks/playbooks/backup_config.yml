@@ -1,0 +1,38 @@
+---
+- hosts: arcos rr
+  gather_facts: false
+
+  vars:
+    arcapi: python-arcapi_0.4.2.1588094334.9fca71f11f8da1b3c68603aee171f1046bef5a96_all.deb
+    uuid: "{{ inventory_hostname | to_uuid() }}"
+    backup_path: './configs/initial_configs/'
+  
+  tasks:
+    - name: copy over latest arcapi
+      copy:
+        src: "/usr/share/arcapi/{{ arcapi }}"
+        dest: "/tmp/{{ arcapi }}"
+      tags: install
+      register: install_arcapi
+
+    - name: install arcapi
+      command: "dpkg -i  /tmp/{{ arcapi }}"
+      tags: install
+      when: install_arcapi.changed
+
+    - name: Save show run (xml format)
+      arcos_command: 
+        commands: "show running-config | save /tmp/{{ inventory_hostname }}.{{ uuid }}"
+        encoding: text
+
+    - name: fetch backup config
+      fetch:
+        src: "/tmp/{{ inventory_hostname }}.{{ uuid }}"
+        dest: "{{ backup_path }}/{{ inventory_hostname }}.xml"
+        flat: yes
+    
+    - name: remove old backup
+      file:
+        path: "/tmp/{{ inventory_hostname }}.{{ uuid }}"
+        state: absent
+

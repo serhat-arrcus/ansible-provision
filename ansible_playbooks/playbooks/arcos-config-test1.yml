@@ -1,0 +1,14 @@
+---
+- hosts: leaf
+  gather_facts: false
+
+  vars:
+   load_operation: merge
+
+  roles:
+   - role: arcos-system
+     tags: system
+   - role: arcos-vlan
+     tags: vlan
+   - role: arcos-l3ints
+     tags: l3

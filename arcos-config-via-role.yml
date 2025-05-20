@@ -1,0 +1,14 @@
+---
+- name: Load Configuration From File
+  hosts: all
+  roles:
+    - role: "../ansible_collections/arrcus/arcos/roles/arcos_config"
+      vars:
+        - config_type: "alias"
+        - load_operation: "merge"
+        - alias:
+            - name: "root"
+              expansion: "show interface"
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli

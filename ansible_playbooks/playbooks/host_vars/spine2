@@ -1,0 +1,65 @@
+base_number: 1
+loopback0_v4: "192.168.100.4"
+loopback0_v6: "2001:5555:AAAA::4"
+
+l3ints:
+  - name: loopback0
+    ipv4: "{{ loopback0_v4 }}/32" 
+    ipv6: "{{ loopback0_v6 }}/128"
+    enabled: true
+
+  - name: swp1
+    ipv4: "192.168.0.2/31"
+    ipv6: "2001:1111:BBAA::1/64"
+    enabled: true
+
+  - name: swp2
+    ipv4: "192.168.0.6/31"
+    ipv6: "2001:1111:BBBB::1/64"
+    enabled: true
+
+  - name: swp3
+    ipv4: "192.168.0.8/31"
+    ipv6: "2001:1111:BBCC::1/64"
+    enabled: true
+
+bgp:
+ network_instance: default
+ as: 65100
+ router_id: "{{ loopback0_v4 }}"
+ address_families:
+   - name: IPV6_UNICAST
+     max_paths: 
+      - name: ebgp
+        value: 32
+      - name: ibgp
+        value: 32
+   - name: IPV4_UNICAST
+     max_paths: 
+      - name: ebgp
+        value: 32
+      - name: ibgp
+        value: 32
+
+ neighbors:
+   - address: 192.168.0.3 
+     peer_as: 65101
+     peer_group: leaf_v4
+   - address: 192.168.0.7 
+     peer_as: 65102
+     peer_group: leaf_v4
+   - address: "2001:1111:BBAA::2" 
+     peer_as: 65101
+     peer_group: leaf_v6
+   - address:  "2001:1111:BBBB::2" 
+     peer_as: 65102
+     peer_group: leaf_v6
+
+ peer_groups: 
+    - name: leaf_v4
+      address_families:
+       - name: IPV4_UNICAST
+    - name: leaf_v6
+      address_families:
+       - name: IPV6_UNICAST
+

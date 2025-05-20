@@ -1,0 +1,18 @@
+---
+- name: Load Configuration From File
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: copy configuration file to leaf 
+      ansible.builtin.copy:
+        src: /local/serhat/ansible-demo/leaf1-config-apr4.txt
+        dest: /tmp/leaf1-config-apr4.txt
+        remote_src: false 
+    - name: load merge configuration
+      arrcus.arcos.arcos_config:
+        src: /tmp/leaf1-config-apr4.txt
+        load_operation: merge
+      register: "arcos_output"
+      when: ansible_network_os == "arrcus.arcos.arcos"

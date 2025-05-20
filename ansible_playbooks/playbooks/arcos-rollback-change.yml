@@ -1,0 +1,46 @@
+---
+- hosts: all
+  gather_facts: false
+
+  vars:
+    load_operation: merge
+    comment: "changing bgp as number"
+
+  roles:
+     - role: arcos-bgp
+  
+  post_tasks:
+     - name: Grab BGP Neighbor output
+       arcos_command:
+           command: "show network-instance default protocol BGP default all-neighbor"
+       register: output
+
+     - name: Index into output
+       set_fact:
+          bgp_neigh: "{{ output['commands'][0]['stdout']['data']['openconfig-network-instance:network-instances']['network-instance'][0]['protocols']['protocol'][0]['bgp'] }}"
+
+     - name: Test for BGP Neigh 
+       assert:
+         that:
+          - "(bgp_neigh['arcos-openconfig-bgp-augments:all-neighbors']['all-neighbor'][0]['state']['session-state'])  == 'ESTABLISHED'"
+         quiet: true
+         fail_msg: "bgp verification failed"
+         success_msg: "bgp verification passed" 
+       register: test
+       ignore_errors: true
+
+     - name: Rollback prior config change
+       block:
+
+         - name: Rollback prior command
+           arcos_config:
+             lines:
+               - config
+               - rollback configuration 0
+               - commit comment "rolling back bgp change"
+               - end
+
+       when: test.failed 
+        
+
+

@@ -1,0 +1,15 @@
+---
+- name: Configure hostname
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: load configuration from file
+      arrcus.arcos.arcos_config:
+        lines: "system hostname ds100"
+        comment: "changing hostname"
+      register: arcos_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - name: Print the Output
+      debug: var=arcos_output

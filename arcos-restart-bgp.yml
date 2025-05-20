@@ -1,0 +1,17 @@
+---
+- name: Restart BGP
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: network_cli
+  tasks:
+    - name: Restart BGP
+      arrcus.arcos.arcos_command:
+        commands:
+          - command: "restart bgp"
+            encoding: "text"
+            prompt: 'Are you sure\? The current process will be terminated and a new one spawned \[yes,NO\]'
+            answer: "yes"
+      register: arcos_command_output
+      when: ansible_network_os == "arrcus.arcos.arcos"
+    - debug: var=arcos_command_output

@@ -1,0 +1,10 @@
+[leaf]
+leaf1 ansible_ssh_host=10.50.101.9  ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+leaf2 ansible_ssh_host=10.50.101.13 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+leaf3 ansible_ssh_host=10.50.101.14 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+[spine]
+spine1 ansible_ssh_host=10.50.101.16 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+spine2 ansible_ssh_host=10.50.101.15 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+[host]
+host1 ansible_ssh_host=10.27.104.14 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus
+host2 ansible_ssh_host=10.27.104.28 ansible_ssh_port=22 ansible_ssh_user='root' ansible_network_os=arrcus.arcos.arcos  ansible_ssh_pass=arrcus

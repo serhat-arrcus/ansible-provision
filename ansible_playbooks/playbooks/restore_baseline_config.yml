@@ -1,0 +1,37 @@
+---
+- hosts: arcos rr
+  gather_facts: false
+  
+  vars:
+    arcapi: python-arcapi_0.4.2.1588094334.9fca71f11f8da1b3c68603aee171f1046bef5a96_all.deb
+    uuid: "{{ inventory_hostname | to_uuid() }}"
+
+  tasks:
+    - name: copy over latest arcapi
+      copy:
+        src: "/usr/share/arcapi/{{ arcapi }}"
+        dest: "/tmp/{{ arcapi }}"
+      tags: install
+      register: install_arcapi
+
+    - name: install arcapi
+      command: "dpkg -i  /tmp/{{ arcapi }}"
+      tags: install
+      when: install_arcapi.changed
+
+    - name: copy over candidate config
+      copy:
+        src: "configs/initial_configs/{{ inventory_hostname }}.xml"
+        dest: "/tmp/.{{ inventory_hostname }}.xml"
+
+    - name: Apply candidate config
+      arcos_config:
+         src: "/tmp/.{{ inventory_hostname }}.xml"
+         load_operation: override
+         comment: "ansible_load_config"
+
+    - name: Remove temp file
+      file:
+       state: absent
+       path: '/tmp/.{{ inventory_hostname }}.xml'
+      check_mode: no

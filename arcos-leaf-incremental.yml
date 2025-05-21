@@ -1,0 +1,19 @@
+---
+- hosts: leaf
+  gather_facts: false
+
+  vars_files:
+   - ./leaf-incremental.yml
+  
+  vars: 
+    load_operation: merge 
+
+  tasks:
+    - name: Merge incremental VLANs with base config
+      set_fact:
+        vlans: "{{ vlans | default([]) + incremental_vlans }}"
+
+    - name: Apply VLAN configuration
+      include_role:
+        name: arcos-vlan
+      tags: vlan    

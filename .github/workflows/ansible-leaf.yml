@@ -30,4 +30,4 @@ jobs:
 
       - name: Run Playbook for leaf1 (Check Mode)
         run: |
-          ansible-playbook -i hosts arcos-leaf-playbook.yml --limit leaf1 --check --diff
+          ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf1 --check --diff

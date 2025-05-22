@@ -1,4 +1,4 @@
-name: Run Ansible for leaf1
+name: Run Ansible for leaf
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Arrcus Collection
         run: |
-          ansible-galaxy collection install arcos.collection
+          ansible-galaxy collection install arcos.collection --pre
 
       - name: Run Playbook for leaf1 (Check Mode)
         run: |

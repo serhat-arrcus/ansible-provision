@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Arrcus Collection
         run: |
-          ansible-galaxy collection install arcos.collection --pre
+          ansible-galaxy collection install arrcus.arcos
 
       - name: Run Playbook for leaf1 (Check Mode)
         run: |

@@ -34,10 +34,10 @@ jobs:
 
       - name: Set up SSH
         run: |
-         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan ce-server-3 >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ce-server-3 >> ~/.ssh/known_hosts
 
       - name: SSH and Run Playbook for leaf1 (Check Mode)
         run: |

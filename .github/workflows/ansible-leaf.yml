@@ -35,7 +35,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.serhat }}" > ~/.ssh/id_rsa
+          echo "$secrets.SERHAT" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 10.50.101.103 >> ~/.ssh/known_hosts
 

@@ -37,7 +37,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ce-server-3 >> ~/.ssh/known_hosts
+          ssh-keyscan 10.50.101.103 >> ~/.ssh/known_hosts
 
       - name: SSH and Run Playbook for leaf1 (Check Mode)
         run: |

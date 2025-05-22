@@ -1,0 +1,78 @@
+<!-- BEGIN Config Diff from arcos-l2vrf role-->
+ network-instance vlan10
++ name vlan10
+ !
++network-instance vlan10
++ type                 L2VLAN
++ vlan                 10
++ advertise-mac-routes true
++ protocol BGP vlan10
++  global route-distinguisher 1.1.1.3:10
+   route-target 10:10 both
++   route-target-type both
++   route-target 10:10
+   !
++  route-target 10:10 both
++  !
++ !
++ vni 1010
++  local-tunnel-endpoint-id 0
++ !
++!
+ network-instance vlan20
++ name vlan20
+ !
++network-instance vlan20
++ type                 L2VLAN
++ vlan                 20
++ advertise-mac-routes true
++ protocol BGP vlan20
++  global route-distinguisher 1.1.1.3:20
+   route-target 20:20 both
++   route-target-type both
++   route-target 20:20
+   !
++  route-target 20:20 both
++  !
++ !
++ vni 1020
++  local-tunnel-endpoint-id 0
++ !
++!
+ network-instance vlan40
++ name vlan40
+ !
++network-instance vlan40
++ type                 L2VLAN
++ vlan                 40
++ advertise-mac-routes true
++ protocol BGP vlan40
++  global route-distinguisher 1.1.1.3:40
+   route-target 40:40 both
++   route-target-type both
++   route-target 40:40
+   !
++  route-target 40:40 both
++  !
++ !
++ vni 1040
++  local-tunnel-endpoint-id 0
++ !
++!
++vlan 10
++ vlan-id 10
++ exit
++!
++vlan 20
++ vlan-id 20
++ exit
++!
++vlan 40
++ vlan-id 40
++ exit
+<!-- END Config Diff from arcos-l2vrf role-->
+<!-- BEGIN Config Diff from arcos-vlan role-->
++vlan 100
++ vlan-id 100
++ exit
+<!-- END Config Diff from arcos-vlan role-->

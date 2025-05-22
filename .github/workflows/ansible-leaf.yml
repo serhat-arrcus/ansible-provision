@@ -35,9 +35,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-                    cat <<EOF > ~/.ssh/id_rsa
-${{ secrets.serhat }}
-EOF
+          echo "${{ secrets.serhat }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H 10.50.101.103 >> ~/.ssh/known_hosts
 
@@ -48,3 +46,5 @@ EOF
            cd /local/serhat/ansible-demo/ansible-provision
            ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf1 --check --diff 
           EOF
+
+

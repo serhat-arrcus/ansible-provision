@@ -18,20 +18,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+     # - name: Set up Python
+     #   uses: actions/setup-python@v4
+     #   with:
+     #     python-version: '3.x'
 
-      - name: Install Ansible
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible
+     # - name: Install Ansible
+     #   run: |
+     #     python -m pip install --upgrade pip
+     #     pip install ansible
 
-      - name: Install Arrcus Collection
-        run: |
-          ansible-galaxy collection install arrcus.arcos
+     # - name: Install Arrcus Collection
+     #   run: |
+     #     ansible-galaxy collection install arrcus.arcos
 
       - name: Run Playbook for leaf1 (Check Mode)
         run: |
+          cd /local/serhat/ansible-demo/ansible-provision
           ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf1 --check --diff

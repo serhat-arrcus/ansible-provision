@@ -32,7 +32,13 @@ jobs:
      #   run: |
      #     ansible-galaxy collection install arrcus.arcos
 
-      - name: Run Playbook for leaf1 (Check Mode)
+      - name: Set up SSH
         run: |
-          cd /local/serhat/ansible-demo/ansible-provision
-          ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf1 --check --diff
+         mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan ce-server-3 >> ~/.ssh/known_hosts
+
+      - name: SSH and Run Playbook for leaf1 (Check Mode)
+        run: |
+          ssh -i ~/.ssh/id_rsa serhat@ce-server-3 'echo "Connected!" && cd /local/serhat/ansible-demo/ansible-provision && ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf1 --check --diff'

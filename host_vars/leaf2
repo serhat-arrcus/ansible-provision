@@ -38,7 +38,12 @@ l3ints:
     ipv4: "100.40.0.1/24"
     ipv6: "2000:40:0:1::1/64"
     enabled: true
-  
+ 
+  - name: vlan100
+    ipv4: "100.100.0.1/24"
+    ipv6: "2000:100:0:1::1/64"
+    enabled: true
+ 
 
 
 bgp:
@@ -103,13 +108,21 @@ vlans:
     advertise_mac_routes: true
     rd: "{{ loopback0_v4 }}:40"
     l2_vni: "1040"
+ - id: 100
+   state: present
+   evpn:
+    advertise_mac_routes: true
+    rd: "{{ loopback0_v4 }}:1100"
+    l2_vni: "1100"
+
+
 
 l2ints:
  - name: swp51
    mode: trunk
    description: "host2-connection"
    enabled: true
-   vlan: [ 10, 20, 40 ]
+   vlan: [ 10, 20, 40, 100 ]
 
 l3vrf:
  - name: "Tenant-A"
@@ -125,6 +138,7 @@ l3vrf:
     - name: vlan10
     - name: vlan20
     - name: vlan40
+    - name: vlan100
     - name: loopback10
    
    protocols:

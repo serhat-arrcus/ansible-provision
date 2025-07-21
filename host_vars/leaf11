@@ -39,7 +39,7 @@ l3ints:
     ipv6: "2000:30:0:1::1/64"
     enabled: true
 
--   name: vlan100
+  - name: vlan100
     ipv4: "100.100.0.1/24"
     ipv6: "2000:100:0:1::1/64"
     enabled: true  

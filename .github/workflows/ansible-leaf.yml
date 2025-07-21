@@ -3,7 +3,7 @@ name: Run Ansible for leaf
 on:
   push:
     paths:
-      - 'host_vars/leaf*'
+      - 'host_vars/leaf11'
       - 'group_vars/**'
       - 'roles/**'
       - 'hosts'

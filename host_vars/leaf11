@@ -122,7 +122,7 @@ vlans:
    state: present
    evpn:
     advertise_mac_routes: true
-    rd: "{{ loopback0_v4 }}:100"
+    rd: "{{ loopback0_v4 }}:1100"
     l2_vni: "1100"
 
 

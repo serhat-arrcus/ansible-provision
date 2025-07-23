@@ -22,7 +22,8 @@ jobs:
       - name: Detect Changed Leaf/Spine Hosts
         id: detect_hosts
         run: |
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          git fetch --depth=2
+          changed_files=$(git diff --name-only HEAD^ HEAD)
           echo "Changed files: $changed_files"
 
           leaf_hosts=""

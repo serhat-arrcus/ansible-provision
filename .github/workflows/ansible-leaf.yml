@@ -39,7 +39,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           #ssh-keyscan -H 10.50.101.103 >> ~/.ssh/known_hosts
 
-      - name: SSH and Run Playbook for leaf1 (Check Mode)
+       - name: SSH and Run Playbook for leaf1 (Check Mode)
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no serhat@10.50.101.103 'echo "Connected!" && cd /local/serhat/ansible-demo/ansible-provisio &&  ansible-playbook -i hosts arcos-config-leaf.yml --limit leaf11 --check --diff' 
           

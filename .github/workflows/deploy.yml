@@ -1,0 +1,59 @@
+name: Run Ansible Playbook for Changed Leaf/Spine Host Vars
+
+on:
+  push:
+    paths:
+      - 'host_vars/leaf*'
+      - 'host_vars/spine*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Detect Changed Leaf/Spine Hosts
+        id: detect_hosts
+        run: |
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "Changed files: $changed_files"
+
+          leaf_hosts=""
+          spine_hosts=""
+
+          for file in $changed_files; do
+            if [[ "$file" == host_vars/leaf* ]]; then
+              h=$(basename "$file")
+              leaf_hosts+="${h},"
+            elif [[ "$file" == host_vars/spine* ]]; then
+              h=$(basename "$file")
+              spine_hosts+="${h},"
+            fi
+          done
+
+          # Remove trailing commas
+          leaf_hosts="${leaf_hosts%,}"
+          spine_hosts="${spine_hosts%,}"
+
+          echo "LEAF_LIMIT=${leaf_hosts}" >> $GITHUB_OUTPUT
+          echo "SPINE_LIMIT=${spine_hosts}" >> $GITHUB_OUTPUT
+
+      - name: Run Leaf Playbook
+        if: steps.detect_hosts.outputs.LEAF_LIMIT != ''
+        run: |
+          echo "Running arcos-config-leaf.yml for: ${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
+          ansible-playbook -i hosts arcos-config-leaf.yml --limit "${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
+
+      - name: Run Spine Playbook
+        if: steps.detect_hosts.outputs.SPINE_LIMIT != ''
+        run: |
+          echo "Running arcos-config-spine.yml for: ${{ steps.detect_hosts.outputs.SPINE_LIMIT }}"
+          ansible-playbook -i hosts arcos-config-spine.yml --limit "${{ steps.detect_hosts.outputs.SPINE_LIMIT }}"
+

@@ -46,11 +46,18 @@ jobs:
           echo "LEAF_LIMIT=${leaf_hosts}" >> $GITHUB_OUTPUT
           echo "SPINE_LIMIT=${spine_hosts}" >> $GITHUB_OUTPUT
 
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$secrets.SERHAT" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          #ssh-keyscan -H 10.50.101.103 >> ~/.ssh/known_hosts
+
       - name: Run Leaf Playbook
         if: steps.detect_hosts.outputs.LEAF_LIMIT != ''
         run: |
           echo "Running arcos-config-leaf.yml for: ${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no karman@10.50.101.103 'echo "Connected!" && cd /home/karman/ansible-provision && ansible-playbook -i hosts arcos-config-leaf.yml --limit "${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no serhat@10.50.101.103 'echo "Connected!" && cd /local/serhat/ansible-demo/ansible-provisio && ansible-playbook -i hosts arcos-config-leaf.yml --limit "${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"'
 
       - name: Run Spine Playbook
         if: steps.detect_hosts.outputs.SPINE_LIMIT != ''

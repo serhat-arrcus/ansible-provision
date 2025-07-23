@@ -16,7 +16,7 @@ l3ints:
     ipv6: "2000:100:1:1::1/128"
     enabled: true
  
-  - name: loopback9
+  - name: loopback8
     ipv4: "200.1.1.1/32"
     enabled: true 
 

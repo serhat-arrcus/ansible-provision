@@ -71,8 +71,3 @@
 + vlan-id 40
 + exit
 <!-- END Config Diff from arcos-l2vrf role-->
-<!-- BEGIN Config Diff from arcos-vlan role-->
-+vlan 100
-+ vlan-id 100
-+ exit
-<!-- END Config Diff from arcos-vlan role-->

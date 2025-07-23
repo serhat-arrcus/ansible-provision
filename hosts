@@ -2,6 +2,13 @@
 leaf1 ansible_ssh_host=10.50.101.9   ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
 leaf2 ansible_ssh_host=10.50.101.13  ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
 leaf3 ansible_ssh_host=10.50.101.14  ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+leaf11 ansible_ssh_host=10.50.102.13   ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+leaf12 ansible_ssh_host=10.50.102.14   ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+leaf13 ansible_ssh_host=10.50.102.26   ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+
 [spine]
 spine1 ansible_ssh_host=10.50.101.16 ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
 spine2 ansible_ssh_host=10.50.101.15 ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+spine11 ansible_ssh_host=10.50.101.26 ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+spine12 ansible_ssh_host=10.50.103.30 ansible_connection=ssh      ansible_user=root       ansible_network_os=arrcus.arcos.arcos         ansible_ssh_pass=arrcus         ansible_scp_if_ssh=true
+

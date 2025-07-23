@@ -14,21 +14,6 @@
 +  local-tunnel-endpoint-id 0
 + !
  !
- network-instance vlan100
-+ advertise-mac-routes true
-+ protocol BGP vlan100
-+  global route-distinguisher 1.1.1.1:100
-   route-target 100:100 both
-+   route-target-type both
-+   route-target 100:100
-   !
-+  route-target 100:100 both
-+  !
-+ !
-+ vni 1100
-+  local-tunnel-endpoint-id 0
-+ !
- !
  network-instance vlan20
 + advertise-mac-routes true
 + protocol BGP vlan20

@@ -3,12 +3,12 @@ name: Run Ansible for leaf
 on:
   push:
     paths:
-      - 'host_vars/leaf11'
-      - 'group_vars/**'
-      - 'roles/**'
-      - 'hosts'
-      - 'arcos-config-leaf.yml'
-      - '.github/workflows/**'
+      #- 'host_vars/leaf11'
+      #- 'group_vars/**'
+      #- 'roles/**'
+      #- 'hosts'
+      #- 'arcos-config-leaf.yml'
+      #- '.github/workflows/**'
 
 jobs:
   deploy-leaf:

@@ -16,6 +16,10 @@ l3ints:
     ipv6: "2000:100:1:1::1/128"
     enabled: true
  
+  - name: loopback11
+    ipv4: "200.1.1.1/32"
+    enabled: true 
+
   - name: swp52
     ipv4: "192.168.0.0/31"
     enabled: true

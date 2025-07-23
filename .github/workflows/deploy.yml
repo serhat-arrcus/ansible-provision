@@ -50,7 +50,7 @@ jobs:
         if: steps.detect_hosts.outputs.LEAF_LIMIT != ''
         run: |
           echo "Running arcos-config-leaf.yml for: ${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
-          cd /home/karman/ansible-provision && ansible-playbook -i hosts arcos-config-leaf.yml --limit "${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no karman@10.50.101.103 'echo "Connected!" && cd /home/karman/ansible-provision && ansible-playbook -i hosts arcos-config-leaf.yml --limit "${{ steps.detect_hosts.outputs.LEAF_LIMIT }}"
 
       - name: Run Spine Playbook
         if: steps.detect_hosts.outputs.SPINE_LIMIT != ''
